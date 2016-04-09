@@ -35,11 +35,11 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
       dataStream.close({"force":true});
       dataStream = null;
       connected = false;
-    };
+    }
   };
   var subscribe_to = function(channel, data){
     if (typeof(data)==='undefined') data = "N/A";
-    console.log("-> subscribing to: " + channel)
+    if (ActionCableConfig.debug) console.log("-> subscribing to: " + channel);
     return new_data_stream().send(JSON.stringify({
         "command": "subscribe",
         "identifier": JSON.stringify({"channel": channel, "data": data})
@@ -47,7 +47,7 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
   };
   var unsubscribe_from = function(channel, data){
     if (typeof(data)==='undefined') data = "N/A";
-    console.log("<- unsubscribing from: " + channel)
+    if (ActionCableConfig.debug) console.log("<- unsubscribing from: " + channel);
     return new_data_stream().send(JSON.stringify({
         "command": "unsubscribe",
         "identifier": JSON.stringify({"channel": channel, "data": data})
@@ -55,7 +55,7 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
   };
   var send_to = function(channel, data, message, action){
     if (typeof(data)==='undefined') data = "N/A";
-    console.log("=> sending to: " + channel)
+    if (ActionCableConfig.debug) console.log("=> sending to: " + channel);
     return new_data_stream().send(JSON.stringify({
         "command": "message",
         "identifier": JSON.stringify({"channel": channel, "data": data}),
@@ -63,7 +63,7 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
       }));
   };
   var new_data_stream = function(){
-    if(dataStream == null) {
+    if(dataStream === null) {
       dataStream = $websocket(wsUrl);
       dataStream.onClose(function(arg){
         close_connection();
@@ -78,11 +78,11 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
       dataStream.onMessage(function(message) {   //arriving message from backend
         controller.post(JSON.parse(message.data));
       });
-    };
+    }
     return dataStream;
   };
   methods = {
-    connected: function(){ return connected },
+    connected: function(){ return connected; },
     attempt_restart: function(){
       close_connection();
       new_data_stream();
@@ -101,7 +101,7 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
       return (this.connected() && unsubscribe_from(channel, data));
     },
     send: function(channel, data, message, action){
-      console.log("send requested");
+      if (ActionCableConfig.debug) console.log("send requested");
       return (this.connected() && send_to(channel, data, message, action));
     }
   };

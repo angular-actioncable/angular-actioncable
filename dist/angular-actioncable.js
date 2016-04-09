@@ -1,16 +1,16 @@
 var ngActionCable= angular.module('ngActionCable', ['ngWebSocket']);
 
-ngActionCable.factory("ActionCableChannel",function ($q, ActionCableController, ActionCableWebsocket){
+ngActionCable.factory("ActionCableChannel",function ($q, ActionCableController, ActionCableWebsocket, ActionCableConfig){
   return function(channelName, channelParams){
     this._websocketControllerActions= function(){
       ActionCableController.actions[this.channelName]= ActionCableController.actions[this.channelName] || {};
       ActionCableController.actions[this.channelName][this._channelParamsString]= ActionCableController.actions[this.channelName][this._channelParamsString] || [];
       return ActionCableController.actions[this.channelName][this._channelParamsString];
-    }
+    };
 
     this._subscriptionCount= function(){
       return this.callbacks.length;
-    }
+    };
 
     this.channelName= channelName;
     this.channelParams= channelParams || {};
@@ -20,36 +20,36 @@ ngActionCable.factory("ActionCableChannel",function ($q, ActionCableController, 
 
     this.subscribe= function(cb){
       var request;
-      if (!(typeof(cb)==="function")) {
+      if ((typeof(cb)!=="function")) {
         console.error("0x01 Callback function was not defined on subscribe(). ActionCable channel: '"+this.channelName+"', params: '"+this._channelParamsString+"'");
         return $q.reject();
-      };
+      }
       if (this.onMessageCallback) {
         console.error("0x02 This ActionCableChannel instance is already subscribed. ActionCable channel: '"+this.channelName+"', params: '"+this._channelParamsString+"'");
         return $q.reject();
-      };
-      if (this._subscriptionCount() === 0) { request= ActionCableWebsocket.subscribe(this.channelName, this.channelParams); };
+      }
+      if (this._subscriptionCount() === 0) { request= ActionCableWebsocket.subscribe(this.channelName, this.channelParams); }
       this._addMessageCallback(cb);
       return (request || $q.resolve());
-    }
+    };
     this.unsubscribe= function(){
       var request;
       this._removeMessageCallback();
-      if (this._subscriptionCount() === 0) { request= ActionCableWebsocket.unsubscribe(this.channelName, this.channelParams); };
+      if (this._subscriptionCount() === 0) { request= ActionCableWebsocket.unsubscribe(this.channelName, this.channelParams); }
       return (request || $q.resolve());
-     }
+    };
     this.send= function(message, action){
       if (!this.onMessageCallback) {
         console.error("0x03 You need to subscribe before you can send a message. ActionCable channel: '"+this.channelName+"', params: '"+this._channelParamsString+"'");
         return $q.reject();
-      };
+      }
       return ActionCableWebsocket.send(this.channelName, this.channelParams, message, action);
-    }
+    };
 
     this._addMessageCallback= function(cb){
       this.onMessageCallback= cb;
       this.callbacks.push(this.onMessageCallback);
-    }
+    };
 
     this._removeMessageCallback= function(){
       for(var i=0; i<this.callbacks.length; i++){
@@ -59,11 +59,11 @@ ngActionCable.factory("ActionCableChannel",function ($q, ActionCableController, 
           return true;
         }
       }
-      console.log("Callbacks:"); console.log(this.callbacks);
-      console.log("onMessageCallback:"); console.log(this.onMessageCallback);
-      throw "can't find onMessageCallback in callbacks array to remove"
-    }
-  }
+      if (ActionCableConfig.debug) { console.log("Callbacks:"); console.log(this.callbacks); }
+      if (ActionCableConfig.debug) { console.log("onMessageCallback:"); console.log(this.onMessageCallback); }
+      throw "Can't find onMessageCallback in callbacks array to remove";
+    };
+  };
 });
 
 // default websocket configs
@@ -75,23 +75,23 @@ ngActionCable.value('ActionCableConfig', {
     debug: false
   });
 
-ngActionCable.factory('ActionCableController', function () {
+ngActionCable.factory('ActionCableController', function (ActionCableConfig) {
 
   // add a hash of callbacks here that `route_channel` will call on an incoming message.
   // actions format: actions[channelName][dataParams] = [callback1, callback2, ...]
   // e.g. actions["GlobalsData"][JSON.stringify({"responder_id":1})]= [function(message){...}, assignment_2: function(message){...}, ... ]
   var actions = {
     welcome: function(message){
-      // console.log('willkommen');
+      if (ActionCableConfig.debug) console.log('Willkommen');
     },
     ping: function(message){
-      // console.log('WS ping');
+      if (ActionCableConfig.debug) console.log('ActionCable ping');
     },
     confirm_subscription: function(message){
-      // console.log('WS confirm_subscription on channel: ' + message.identifier);
+      if (ActionCableConfig.debug) console.log('ActionCable confirm_subscription on channel: ' + message.identifier);
     },
     ws_404: function(message){
-      // console.log('Route not found: ' + message);
+      if (ActionCableConfig.debug) console.log('ActionCable route not found: ' + message);
     }
   };
 
@@ -99,7 +99,7 @@ ngActionCable.factory('ActionCableController', function () {
     angular.forEach(actionCallbacks, function(func, id){
       func.apply(null, [message]);
     });
-  }
+  };
 
   var route = function(message){
     if (!!actions[message.type]) {
@@ -109,7 +109,7 @@ ngActionCable.factory('ActionCableController', function () {
       routeToActions(actionCallbacks, message.message);
     } else {
       actions.ws_404(message);
-    };
+    }
   };
 
 
@@ -120,8 +120,8 @@ ngActionCable.factory('ActionCableController', function () {
   function channel_from(message){
     if (message && message.identifier) {
       return JSON.parse(message.identifier).channel;
-    };
-  };
+    }
+  }
 
   function params_from(message){
     var paramsData= JSON.parse(message.identifier).data;
@@ -146,7 +146,7 @@ ngActionCable.factory('ActionCableController', function () {
 // of the internal trivalent logic. Exactly one will be true at all times.
 //
 // Actions are start() and stop()
-ngActionCable.factory("ActionCableSocketWrangler", function(ActionCableWebsocket) {
+ngActionCable.factory("ActionCableSocketWrangler", function(ActionCableWebsocket, ActionCableConfig) {
   var intervalTime= 8647;
   var websocket= ActionCableWebsocket;
   var _live= false;
@@ -164,12 +164,12 @@ ngActionCable.factory("ActionCableSocketWrangler", function(ActionCableWebsocket
     _connecting= false;
   };
   websocket.on_connection_close_callback = function(){
-    if (_live) { startInterval(); };
-    console.log("close callback");
+    if (_live) { startInterval(); }
+    if (ActionCableConfig.debug) console.log("close callback");
   };
   websocket.on_connection_open_callback = function(){
     stopInterval();
-    console.log("open callback");
+    if (ActionCableConfig.debug) console.log("open callback");
   };
   var methods= {
     connected: function(){
@@ -182,13 +182,13 @@ ngActionCable.factory("ActionCableSocketWrangler", function(ActionCableWebsocket
       return !_live;
     },
     start: function(){
-      console.info("Live STARTED");
+      if (ActionCableConfig.debug) console.info("Live STARTED");
       _live= true;
       startInterval();
       connectNow();
     },
     stop: function(){
-      console.info("Live stopped");
+      if (ActionCableConfig.debug) console.info("Live stopped");
       _live= false;
       stopInterval();
       websocket.close();
@@ -234,11 +234,11 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
       dataStream.close({"force":true});
       dataStream = null;
       connected = false;
-    };
+    }
   };
   var subscribe_to = function(channel, data){
     if (typeof(data)==='undefined') data = "N/A";
-    console.log("-> subscribing to: " + channel)
+    if (ActionCableConfig.debug) console.log("-> subscribing to: " + channel);
     return new_data_stream().send(JSON.stringify({
         "command": "subscribe",
         "identifier": JSON.stringify({"channel": channel, "data": data})
@@ -246,7 +246,7 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
   };
   var unsubscribe_from = function(channel, data){
     if (typeof(data)==='undefined') data = "N/A";
-    console.log("<- unsubscribing from: " + channel)
+    if (ActionCableConfig.debug) console.log("<- unsubscribing from: " + channel);
     return new_data_stream().send(JSON.stringify({
         "command": "unsubscribe",
         "identifier": JSON.stringify({"channel": channel, "data": data})
@@ -254,7 +254,7 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
   };
   var send_to = function(channel, data, message, action){
     if (typeof(data)==='undefined') data = "N/A";
-    console.log("=> sending to: " + channel)
+    if (ActionCableConfig.debug) console.log("=> sending to: " + channel);
     return new_data_stream().send(JSON.stringify({
         "command": "message",
         "identifier": JSON.stringify({"channel": channel, "data": data}),
@@ -262,7 +262,7 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
       }));
   };
   var new_data_stream = function(){
-    if(dataStream == null) {
+    if(dataStream === null) {
       dataStream = $websocket(wsUrl);
       dataStream.onClose(function(arg){
         close_connection();
@@ -277,11 +277,11 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
       dataStream.onMessage(function(message) {   //arriving message from backend
         controller.post(JSON.parse(message.data));
       });
-    };
+    }
     return dataStream;
   };
   methods = {
-    connected: function(){ return connected },
+    connected: function(){ return connected; },
     attempt_restart: function(){
       close_connection();
       new_data_stream();
@@ -300,7 +300,7 @@ ngActionCable.factory("ActionCableWebsocket", function($websocket, ActionCableCo
       return (this.connected() && unsubscribe_from(channel, data));
     },
     send: function(channel, data, message, action){
-      console.log("send requested");
+      if (ActionCableConfig.debug) console.log("send requested");
       return (this.connected() && send_to(channel, data, message, action));
     }
   };

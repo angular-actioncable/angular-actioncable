@@ -1,20 +1,20 @@
-ngActionCable.factory('ActionCableController', function () {
+ngActionCable.factory('ActionCableController', function (ActionCableConfig) {
 
   // add a hash of callbacks here that `route_channel` will call on an incoming message.
   // actions format: actions[channelName][dataParams] = [callback1, callback2, ...]
   // e.g. actions["GlobalsData"][JSON.stringify({"responder_id":1})]= [function(message){...}, assignment_2: function(message){...}, ... ]
   var actions = {
     welcome: function(message){
-      // console.log('willkommen');
+      if (ActionCableConfig.debug) console.log('Willkommen');
     },
     ping: function(message){
-      // console.log('WS ping');
+      if (ActionCableConfig.debug) console.log('ActionCable ping');
     },
     confirm_subscription: function(message){
-      // console.log('WS confirm_subscription on channel: ' + message.identifier);
+      if (ActionCableConfig.debug) console.log('ActionCable confirm_subscription on channel: ' + message.identifier);
     },
     ws_404: function(message){
-      // console.log('Route not found: ' + message);
+      if (ActionCableConfig.debug) console.log('ActionCable route not found: ' + message);
     }
   };
 
@@ -22,7 +22,7 @@ ngActionCable.factory('ActionCableController', function () {
     angular.forEach(actionCallbacks, function(func, id){
       func.apply(null, [message]);
     });
-  }
+  };
 
   var route = function(message){
     if (!!actions[message.type]) {
@@ -32,7 +32,7 @@ ngActionCable.factory('ActionCableController', function () {
       routeToActions(actionCallbacks, message.message);
     } else {
       actions.ws_404(message);
-    };
+    }
   };
 
 
@@ -43,8 +43,8 @@ ngActionCable.factory('ActionCableController', function () {
   function channel_from(message){
     if (message && message.identifier) {
       return JSON.parse(message.identifier).channel;
-    };
-  };
+    }
+  }
 
   function params_from(message){
     var paramsData= JSON.parse(message.identifier).data;

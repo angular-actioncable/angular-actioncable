@@ -5,7 +5,7 @@
 // of the internal trivalent logic. Exactly one will be true at all times.
 //
 // Actions are start() and stop()
-ngActionCable.factory("ActionCableSocketWrangler", function(ActionCableWebsocket) {
+ngActionCable.factory("ActionCableSocketWrangler", function(ActionCableWebsocket, ActionCableConfig) {
   var intervalTime= 8647;
   var websocket= ActionCableWebsocket;
   var _live= false;
@@ -23,12 +23,12 @@ ngActionCable.factory("ActionCableSocketWrangler", function(ActionCableWebsocket
     _connecting= false;
   };
   websocket.on_connection_close_callback = function(){
-    if (_live) { startInterval(); };
-    console.log("close callback");
+    if (_live) { startInterval(); }
+    if (ActionCableConfig.debug) console.log("close callback");
   };
   websocket.on_connection_open_callback = function(){
     stopInterval();
-    console.log("open callback");
+    if (ActionCableConfig.debug) console.log("open callback");
   };
   var methods= {
     connected: function(){
@@ -41,13 +41,13 @@ ngActionCable.factory("ActionCableSocketWrangler", function(ActionCableWebsocket
       return !_live;
     },
     start: function(){
-      console.info("Live STARTED");
+      if (ActionCableConfig.debug) console.info("Live STARTED");
       _live= true;
       startInterval();
       connectNow();
     },
     stop: function(){
-      console.info("Live stopped");
+      if (ActionCableConfig.debug) console.info("Live stopped");
       _live= false;
       stopInterval();
       websocket.close();
