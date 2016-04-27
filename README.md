@@ -7,9 +7,9 @@ An Angular 1.x service for seamlessly integrating Rails 5 (ActionCable) into fro
 
 #### How to add this to your project
 
-* Using bower and running `bower install angular-actioncable --save` (prefered)
-* Using npm and running `npm install angular-actioncable --save`
-* [Downloading it manually](https://github.com/angular-actioncable/angular-actioncable/blob/0.0.6/dist/angular-actioncable.js)
+* Use bower and run `bower install angular-actioncable --save` (preferred)
+* Use npm and run `npm install angular-actioncable --save`
+* [Download it manually](https://github.com/angular-actioncable/angular-actioncable/blob/0.0.6/dist/angular-actioncable.js)
 * CDN for development `https://rawgit.com/angular-actioncable/angular-actioncable/0.0.6/dist/angular-actioncable.js`
 * CDN for production `https://cdn.rawgit.com/angular-actioncable/angular-actioncable/0.0.6/dist/angular-actioncable.js`
 
@@ -156,10 +156,10 @@ my_app.run(function (ActionCableConfig){
 
 ## Examples
 
- - https://github.com/Neil-Ni/rails5-actioncable-angular-demo - demo project with rails 5 backend and angular frontend
+ - [Demo project with Rails 5 backend and Angular frontend](https://github.com/Neil-Ni/rails5-actioncable-angular-demo) from [Neil-Ni](https://github.com/Neil-Ni)
 
 ## License
-MIT
+[MIT](https://github.com/angular-actioncable/angular-actioncable/blob/master/LICENSE.txt)
 
 ## Setup Development
  - `npm install gulp-cli --global`
@@ -180,9 +180,9 @@ MIT
    * `gulp test-dist`
    * `gulp test-min`
 
-  or run all above tasks in once call using `gulp release`
+   or run all above tasks using `gulp release`
 
 ## Publish
- - change the version in `bower.json` and `package.json` and submit a commit named `bump version` to `master` branch
+ - change the version in `bower.json` and `package.json` and `README.md` (5 occurrences) and push a commit named `bump version` to `master` branch
  - tag a new release with the new version in github (bower will use this)
  - publish to npm: pull master, `npm login`, `npm publish`
