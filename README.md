@@ -93,6 +93,10 @@ Supports:
 - Rails 5.0.0.beta3
 - Rails master [at the time of writing](https://github.com/rails/rails/tree/b8d1dbf9933e3d67e15cd06116164286ba15c6a7)
 
+## Examples
+
+ - [Demo project with Rails 5 backend and Angular frontend](https://github.com/Neil-Ni/rails5-actioncable-angular-demo) from [Neil-Ni](https://github.com/Neil-Ni)
+
 ## API
 
 ### Factory: `ActionCableChannel`
@@ -152,11 +156,6 @@ my_app.run(function (ActionCableConfig){
 
  * *Q.*: What if the browser doesn't support WebSockets?
  * *A.*: This module depends on [angular-websocket](https://github.com/AngularClass/angular-websocket) which will not help; it does not have a fallback story for browsers that do not support WebSockets. Please [check](http://caniuse.com/#feat=websockets) your browser target support.
-
-
-## Examples
-
- - [Demo project with Rails 5 backend and Angular frontend](https://github.com/Neil-Ni/rails5-actioncable-angular-demo) from [Neil-Ni](https://github.com/Neil-Ni)
 
 ## License
 [MIT](https://github.com/angular-actioncable/angular-actioncable/blob/master/LICENSE.txt)
