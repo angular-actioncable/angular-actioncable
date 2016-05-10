@@ -19,6 +19,7 @@ module.exports = function(config) {
       'bower_components/angular/angular.js',
       'node_modules/angular-mocks/angular-mocks.js',
       'bower_components/angular-websocket/angular-websocket.js',
+      'bower_components/angular-websocket/angular-websocket-mock.js',
       'src/**/*.js',
       'test/**/*.spec.js'
     ],
@@ -60,7 +61,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Firefox', 'Chrome', 'PhantomJS'],
+    browsers: ['PhantomJS', 'Firefox', 'Chrome'],
     customLaunchers: {
       Chrome_travis_ci: {
         base: 'Chrome',
