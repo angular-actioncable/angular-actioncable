@@ -8,8 +8,8 @@ describe('ActionCableWebsocket', function(){
       $websocketBackend,
       $websocket;
 
-  beforeEach(angular.mock.module('ngWebSocket', 'ngWebSocketMock'));
   beforeEach(module('ngActionCable'));
+  beforeEach(angular.mock.module('ngWebSocket', 'ngWebSocketMock'));
 
   resetWebsocketMock = function () {
     ActionCableController = {
@@ -25,7 +25,7 @@ describe('ActionCableWebsocket', function(){
     resetWebsocketMock();
     // module(function($provide) { $provide.value('$websocket', $websocket); });
     module(function($provide) { $provide.value('ActionCableController', ActionCableController); });
-    module(function($provide) { $provide.value('ActionCableConfig', { wsUri: 'ws://localhost:8080/api', autoStart: true }); });
+    module(function($provide) { $provide.value('ActionCableConfig', { wsUri: 'ws://localhost:8080/api', autoStart: false }); });
   });
 
 
@@ -38,7 +38,8 @@ describe('ActionCableWebsocket', function(){
 
     $websocketBackend.mock();
     $websocketBackend.expectConnect('ws://localhost:8080/api');
-    $websocketBackend.expectSend({data: JSON.stringify({test: true})});
+    $websocketBackend.expectClose();
+    // $websocketBackend.expectSend({data: JSON.stringify({test: true})});
 
   }));
 
@@ -49,18 +50,25 @@ describe('ActionCableWebsocket', function(){
 
   describe('subscribe', function() {
     beforeEach(function(done) {
-      $websocket('ws://localhost:8080/api');
-      var _done= done;
+      // var _done= done;
+      wsDataStream= $websocket('ws://localhost:8080/api');
+
+      console.log("------------------------------ websocketBackend.isConnected():");
+      console.log($websocketBackend.isConnected('ws://localhost:8080/api'));    //returns true
+      // done();
+
       // ActionCableWebsocket.attempt_restart();
-      $websocket.onOpen = function(){
-        console.log("``````````````````````````````");
-        console.log(d);
-        _done();
-      }
+      wsDataStream.onOpen(function(arg){   // is never called
+        console.log("------------------------------ done:");
+        console.log(done);
+        done();
+      })
+
+      // $websocketBackend.flush();
     });
 
     it('subscribes a channel', function(){
-      console.log("----------------------------------------------------");
+      console.log("------------------------------ ActionCableWebsocket.connected():");
       console.log(ActionCableWebsocket.connected());
 
       // expect(ActionCableWebsocket.subscribe('channel',{data: 0})).toBe(wsDataStream);
