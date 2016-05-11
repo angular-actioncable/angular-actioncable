@@ -5,8 +5,8 @@ describe('ActionCableWebsocket', function(){
       ActionCableController,
       wsDataStream,
       resetWebsocketMock,
-      $websocketBackend,
-      $websocket;
+      $websocket,
+      dataStreamMock;
 
   beforeEach(module('ngActionCable'));
   beforeEach(angular.mock.module('ngWebSocket', 'ngWebSocketMock'));
@@ -19,28 +19,43 @@ describe('ActionCableWebsocket', function(){
       },
       after_ping_callback: function() {},
     };
+
+    $websocket= function(url){
+      if (dataStreamMock) {
+        dataStreamMock.onopen();
+        return dataStreamMock;
+      }
+
+      var callbacks= {
+        open: [],
+        close: [],
+        message: []
+      }
+
+      dataStreamMock= new WebSocket(url);
+      dataStreamMock.onOpen= function(cb){ dataStreamMock.onopen= cb; }
+      dataStreamMock.onClose = function(cb){ dataStreamMock.onclose= cb; }
+      dataStreamMock.onMessage = function(cb){ dataStreamMock.onmessage= cb; }
+
+      dataStreamMock.start = function(args){ dataStreamMock.onopen(); }
+      dataStreamMock.close = function(args){ dataStreamMock.onclose(); }
+      setTimeout(function(){dataStreamMock.onopen()}, 10);
+      return dataStreamMock;
+    }
+
   };
 
   beforeEach(function() {
     resetWebsocketMock();
-    // module(function($provide) { $provide.value('$websocket', $websocket); });
+    module(function($provide) { $provide.value('$websocket', $websocket); });
     module(function($provide) { $provide.value('ActionCableController', ActionCableController); });
-    module(function($provide) { $provide.value('ActionCableConfig', { wsUri: 'ws://localhost:8080/api', autoStart: false }); });
+    module(function($provide) { $provide.value('ActionCableConfig', { wsUri: 'ws://localhost:12345', autoStart: false }); });
   });
 
 
 
-  beforeEach(inject(function (_ActionCableWebsocket_, _$websocketBackend_, _$websocket_, _ActionCableSocketWrangler_) {
+  beforeEach(inject(function (_ActionCableWebsocket_, _$websocketBackend_, _ActionCableSocketWrangler_, _$rootScope_) {
     ActionCableWebsocket= _ActionCableWebsocket_;
-    $websocketBackend = _$websocketBackend_;
-    $websocket = _$websocket_;
-    // _ActionCableSocketWrangler_.start();
-
-    $websocketBackend.mock();
-    $websocketBackend.expectConnect('ws://localhost:8080/api');
-    $websocketBackend.expectClose();
-    // $websocketBackend.expectSend({data: JSON.stringify({test: true})});
-
   }));
 
 
@@ -50,21 +65,14 @@ describe('ActionCableWebsocket', function(){
 
   describe('subscribe', function() {
     beforeEach(function(done) {
-      // var _done= done;
-      wsDataStream= $websocket('ws://localhost:8080/api');
-
-      console.log("------------------------------ websocketBackend.isConnected():");
-      console.log($websocketBackend.isConnected('ws://localhost:8080/api'));    //returns true
-      // done();
-
-      // ActionCableWebsocket.attempt_restart();
-      wsDataStream.onOpen(function(arg){   // is never called
-        console.log("------------------------------ done:");
-        console.log(done);
-        done();
-      })
-
-      // $websocketBackend.flush();
+      // wsDataStream= $websocket('ws://localhost:12345');
+      ActionCableWebsocket.attempt_restart();
+      setTimeout(function(){ done() },50);
+      // wsDataStream.onOpen(function(arg){   // is never called
+      //   console.log("------------------------------ done:");
+      //   console.log(done);
+      //   done();
+      // })
     });
 
     it('subscribes a channel', function(){
