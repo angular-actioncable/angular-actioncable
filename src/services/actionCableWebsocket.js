@@ -27,6 +27,7 @@
 
 ngActionCable.factory("ActionCableWebsocket", ['$websocket', 'ActionCableController', 'ActionCableConfig', function($websocket, ActionCableController, ActionCableConfig) {
   var wsUrl = ActionCableConfig.wsUri;
+  var wsOptions = ActionCableConfig.wsOptions;
   var controller = ActionCableController;
   var dataStream = null;
   var methods;
@@ -66,7 +67,7 @@ ngActionCable.factory("ActionCableWebsocket", ['$websocket', 'ActionCableControl
   };
   var new_data_stream = function(){
     if(dataStream === null) {
-      dataStream = $websocket(wsUrl);
+      dataStream = $websocket(wsUrl, null, null, wsOptions);
       dataStream.onClose(function(arg){
         close_connection();
         connected = false;
