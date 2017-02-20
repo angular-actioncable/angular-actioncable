@@ -2,7 +2,7 @@
   "name": "angular-actioncable",
   "version": "1.1.1",
   "description": "Connect Angular to ActionCable",
-  "main": "dist/angular-actioncable.min.js",
+  "main": "index",
   "scripts": {
     "test_src": "gulp jshint && gulp test",
     "build": "gulp jshint && gulp test && gulp build && gulp test-dist && gulp test-min"
