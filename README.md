@@ -18,7 +18,7 @@ An Angular 1.x service for seamlessly integrating Rails 5 (ActionCable) into fro
 * Use npm and run `npm install angular-actioncable --save`
 * [Download it manually](https://github.com/angular-actioncable/angular-actioncable/blob/1.1.1/dist/angular-actioncable.js)
 * CDN for development `https://rawgit.com/angular-actioncable/angular-actioncable/1.1.1/dist/angular-actioncable.js`
-* CDN for production `https://cdn.rawgit.com/angular-actioncable/angular-actioncable/1.1.1/dist/angular-actioncable.js`
+* CDN for production `https://cdn.rawgit.com/angular-actioncable/angular-actioncable/1.1.1/dist/angular-actioncable.min.js`
 
 #### The One-Liner. (not recommended, but possible)
 
