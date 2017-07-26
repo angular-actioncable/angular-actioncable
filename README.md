@@ -150,12 +150,14 @@ _You can override the defaults._
 name      | type    | description
 ----------|---------|------------
 wsUri     | String  | URI to connect ngActionCable to ActionCable.  If this is inside a Rails view, it will be read from the action_cable_meta_tag but can still be overridden.
+protocols | Array   | Specify protocol headers for the websocket connection. Empty by default.
 autoStart | Boolean | Connect automatically? Default is true.<br />`ActionCableConfig.autoStart= false;`
 debug     | Boolean | Show verbose logs.  Default is false.<br />`ActionCableConfig.debug= true;`
 
 ```javascript
 my_app.run(function (ActionCableConfig){
   ActionCableConfig.wsUri= "wss://example.com/cable";
+  ActionCableConfig.protocols = ['soap', 'wamp'];
   ActionCableConfig.autoStart= false;
 });
 ```

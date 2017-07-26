@@ -6,7 +6,8 @@ describe('ActionCableWebsocket', function(){
   var resetMocks, $websocketClassMock, ngWebSocketInstanceMock, ActionCableConfigMock;
   resetMocks= function() {
     ActionCableConfigMock= {
-      wsUri: 'foobarz42uri'
+      wsUri: 'foobarz42uri',
+      protocols: []
     };
     ngWebSocketInstanceMock= {
       close: function() {},
@@ -34,11 +35,16 @@ describe('ActionCableWebsocket', function(){
   });
   it('uses the initial URI provided by ActionCableConfig', function(){
     ActionCableWebsocket.attempt_restart();
-    expect($websocketClassMock).toHaveBeenCalledWith('foobarz42uri');
+    expect($websocketClassMock).toHaveBeenCalledWith('foobarz42uri', []);
   });
   it('uses a new URI changed after initialisation', function(){
     ActionCableConfigMock.wsUri= 'newBarzUri';
     ActionCableWebsocket.attempt_restart();
-    expect($websocketClassMock).toHaveBeenCalledWith('newBarzUri');
+    expect($websocketClassMock).toHaveBeenCalledWith('newBarzUri', []);
+  });
+  it('uses user-defined protocols for websocket connection if provided', function() {
+    ActionCableConfigMock.protocols = ['protocol1', 'protocol2'];
+    ActionCableWebsocket.attempt_restart();
+    expect($websocketClassMock).toHaveBeenCalledWith('foobarz42uri', ['protocol1', 'protocol2']);
   });
 });

@@ -8,7 +8,8 @@ ngActionCable.factory('ActionCableConfig', function() {
   var _wsUri;
   var config= {
     autoStart: true,
-    debug: false
+    debug: false,
+    protocols: []
   };
   Object.defineProperty(config, 'wsUri', {
     get: function () {
