@@ -1,4 +1,7 @@
-## edge
+## 1.2.0
+
+Features:
+  - Use javascript prototyping for ActionCableChannel instance methods to allow method overriding
 
 ## 1.1.1
 
