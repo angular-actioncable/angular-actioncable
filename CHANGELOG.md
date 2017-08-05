@@ -1,5 +1,7 @@
 ## edge
 
+## 1.3.0
+
 Features:
   - Allow configuration of websocket protocol headers
 
