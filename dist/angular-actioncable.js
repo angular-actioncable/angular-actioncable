@@ -236,8 +236,8 @@ ngActionCable.factory('ActionCableConfig', function() {
 // of the internal trivalent logic. Exactly one will be true at all times.
 //
 // Actions are start() and stop()
-ngActionCable.factory('ActionCableSocketWrangler', ['$rootScope', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableController',
-function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableController) {
+ngActionCable.factory('ActionCableSocketWrangler', ['$rootScope', '$q', 'ActionCableWebsocket', 'ActionCableConfig', 'ActionCableController',
+function($rootScope, $q, ActionCableWebsocket, ActionCableConfig, ActionCableController) {
   var reconnectIntervalTime= 7537;
   var timeoutTime= 20143;
   var websocket= ActionCableWebsocket;
@@ -245,6 +245,7 @@ function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableControl
   var _live= false;
   var _connecting= false;
   var _reconnectTimeout= false;
+  var preConnectionCallbacks= [];
   var setReconnectTimeout= function(){
     stopReconnectTimeout();
     _reconnectTimeout = _reconnectTimeout || setTimeout(function(){
@@ -260,8 +261,14 @@ function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableControl
     setReconnectTimeout();
   };
   var connectNow= function(){
-    websocket.attempt_restart();
-    setReconnectTimeout();
+    var promises = preConnectionCallbacks.map(function(callback){
+      return callback();
+    });
+
+    $q.all(promises).then(function(){
+      websocket.attempt_restart();
+      setReconnectTimeout();
+    });
   };
   var startReconnectInterval= function(){
     _connecting= _connecting || setInterval(function(){
@@ -300,6 +307,9 @@ function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableControl
       stopReconnectInterval();
       stopReconnectTimeout();
       websocket.close();
+    },
+    preConnectionCallbacks: function(){
+      return preConnectionCallbacks;
     }
   };
 
