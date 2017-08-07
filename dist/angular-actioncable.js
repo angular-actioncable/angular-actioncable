@@ -265,10 +265,15 @@ function($rootScope, $q, ActionCableWebsocket, ActionCableConfig, ActionCableCon
       return callback();
     });
 
-    $q.all(promises).then(function(){
-      websocket.attempt_restart();
-      setReconnectTimeout();
-    });
+    $q.all(promises).then(
+      function(){
+        websocket.attempt_restart();
+        setReconnectTimeout();
+      },
+      function(){
+        setReconnectTimeout();
+      }
+    );
   };
   var startReconnectInterval= function(){
     _connecting= _connecting || setInterval(function(){
