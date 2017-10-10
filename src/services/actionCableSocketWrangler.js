@@ -16,7 +16,6 @@ function($rootScope, ActionCableWebsocket, ActionCableConfig, ActionCableControl
   var _live= false;
   var _connecting= false;
   var _reconnectTimeout= false;
-  var preConnectionCallbacks= [];
   var safeDigest= function(){
     if (!$rootScope.$$phase) {
       $rootScope.$digest();
