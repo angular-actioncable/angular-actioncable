@@ -94,6 +94,42 @@ class MyChannel < ApplicationCable::Channel
 end
 ```
 
+## A note about destroyed Angular objects
+
+This package is not managing the consumer unsubscribing when you're destroying an Angular object (controller, component, ...) so you must do it.
+
+A simple way to do so is to use the minimal version of the "better way" example:
+
+```javascript
+function SharedMsStockResponse($q, $scope, x2js, stockResponseService, Supplier, ActionCableChannel) {
+  var ctrl = this
+
+  var consumer = new ActionCableChannel("MyChannel", {});
+  var callback = function(result) {
+    console.log("result", result);
+    # ctrl is accessible here
+  }
+  consumer.subscribe(callback).then(function() {
+    $scope.$on("$destroy", function() {
+      consumer.unsubscribe();
+    });
+  });
+});
+
+angular.module('MY_APP')
+
+.component('sharedMsStockResponse', {
+  templateUrl: ...,
+  controller: ['$q', '$scope', 'x2js', 'stockResponseService', 'Supplier', 'ActionCableChannel', SharedMsStockResponse],
+  bindings: {
+    ...
+    saleRow: '<'
+  }
+});
+```
+
+Please have a look at [this issue](https://github.com/angular-actioncable/angular-actioncable/issues/76#issuecomment-355930720) in order to get more information.
+
 ## Support
 
 Supports:
