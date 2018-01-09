@@ -123,10 +123,11 @@ onConfirmSubscription | callback:Function                                       
 _singleton_
 
 ##### Methods
-name        | arguments                                              | description
-------------|--------------------------------------------------------|--------------------------------------------
-start       |                                                        | Starts ngActionCable services. `ActionCableSocketWrangler.start();`<br />_This will start by default unless disabled._
-stop        |                                                        | Stops ngActionCable services. `ActionCableSocketWrangler.stop();`
+name                   | arguments | description
+-----------------------|-----------|--------------------------------------------
+start                  |           | Starts ngActionCable services. `ActionCableSocketWrangler.start();`<br />_This will start by default unless disabled._
+stop                   |           | Stops ngActionCable services. `ActionCableSocketWrangler.stop();`
+preConnectionCallbacks |           | Allows registration of functions which return promises which much be resolved before attempting to establish a connection. `ActionCableSocketWrangler.preConnectionCallbacks().push(myFunctionThatReturnsAPromise);`
 
 ##### Properties
 
