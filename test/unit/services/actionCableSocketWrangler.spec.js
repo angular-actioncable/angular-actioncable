@@ -3,7 +3,8 @@
 describe('ActionCableSocketWrangler', function(){
   var ActionCableSocketWrangler,
       ActionCableWebsocket,
-      resetWebsocketMock;
+      resetWebsocketMock,
+      $rootScope;
 
   resetWebsocketMock = function () {
     ActionCableWebsocket = {
@@ -22,8 +23,9 @@ describe('ActionCableSocketWrangler', function(){
     module(function($provide) { $provide.value('ActionCableConfig', { autoStart: false }); });
   });
 
-  beforeEach(inject(function(_ActionCableSocketWrangler_) {
+  beforeEach(inject(function(_ActionCableSocketWrangler_, _$rootScope_) {
     ActionCableSocketWrangler= _ActionCableSocketWrangler_;
+    $rootScope = _$rootScope_;
   }));
 
   afterEach(function() {
@@ -41,6 +43,7 @@ describe('ActionCableSocketWrangler', function(){
           this.on_connection_open_callback();
         };
         ActionCableSocketWrangler.start();
+        $rootScope.$apply();
       });
 
       it('returns true', function(){
@@ -52,6 +55,7 @@ describe('ActionCableSocketWrangler', function(){
       beforeEach(function() {
         ActionCableWebsocket.attempt_restart = function() {};
         ActionCableSocketWrangler.start();
+        $rootScope.$apply();
       });
 
       it('returns false', function(){
@@ -69,6 +73,7 @@ describe('ActionCableSocketWrangler', function(){
       beforeEach(function() {
         ActionCableWebsocket.attempt_restart = function() {};
         ActionCableSocketWrangler.start();
+        $rootScope.$apply();
       });
 
       it('returns true', function(){
@@ -88,6 +93,7 @@ describe('ActionCableSocketWrangler', function(){
           this.on_connection_open_callback();
         };
         ActionCableSocketWrangler.start();
+        $rootScope.$apply();
       });
 
       it('returns false', function(){
@@ -101,6 +107,7 @@ describe('ActionCableSocketWrangler', function(){
           this.on_connection_open_callback();
         };
         ActionCableSocketWrangler.start();
+        $rootScope.$apply();
         ActionCableSocketWrangler.stop();
       });
 
